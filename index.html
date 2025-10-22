@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Finance Tracker | Home</title>
+
+  <!-- Redirect if user info not found -->
+  <script>
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    if (!user) {
+      window.location.href = "userinfo.html";
+    }
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #1e3a8a;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      padding: 40px 50px;
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #1e3a8a;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #475569;
+      margin-bottom: 25px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    a {
+      text-decoration: none;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      color: white;
+      padding: 12px 22px;
+      border-radius: 15px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+    }
+
+    a:hover {
+      transform: scale(1.07);
+      box-shadow: 0 6px 20px rgba(59,130,246,0.4);
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .container {
+        width: 85%;
+        padding: 25px;
+      }
+      a {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>💰 Daily Finance Tracker</h1>
+    <p class="tagline">Manage your Money Effortlessly💡</p>
+
+    <p id="welcomeText">Welcome back!</p>
+
+    <div class="buttons">
+      <a href="addentry.html">➕ Add New Entry</a>
+      
+      <a href="userinfo.html">⚙️ Profile</a>
+      <a href="viewRecords.html" class="view-btn">📊 View Records</a>
+
+    </div>
+
+    <div class="footer">© 2025 Daily Finance Tracker</div>
+  </div>
+
+  <script>
+    // Display welcome message using saved user info
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (userInfo) {
+      document.getElementById("welcomeText").textContent =
+        `👋 Welcome, ${userInfo.name || "User"} (${userInfo.profession || "—"})`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View Records | Daily Finance Tracker</title>
+
+  <!-- Redirect if no user info -->
+  <script>
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    if (!user) {
+      window.location.href = "userinfo.html";
+    }
+  </script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #1e3a8a;
+      padding: 20px 0;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      padding: 35px 40px;
+      width: 90%;
+      max-width: 750px;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+      margin-bottom: 30px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      margin-bottom: 5px;
+      color: #1e3a8a;
+    }
+
+    #welcomeUser {
+      color: #475569;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    /* Summary section */
+    .summary {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .summary div {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 15px;
+      padding: 12px 20px;
+      min-width: 120px;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+      font-weight: 600;
+      color: #1e3a8a;
+      transition: all 0.3s ease;
+    }
+
+    .summary div:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: center;
+      color: #334155;
+    }
+
+    th {
+      background: #bfdbfe;
+      color: #1e3a8a;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    tr:nth-child(even) { background: rgba(240, 249, 255, 0.6); }
+    tr:hover { background: rgba(191, 219, 254, 0.5); transition: 0.3s; }
+
+    /* Buttons */
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button, a {
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .delete-btn {
+      background: #f87171;
+      color: white;
+    }
+    .delete-btn:hover {
+      background: #ef4444;
+      transform: scale(1.05);
+    }
+
+    .clear-btn {
+      background: #fca5a5;
+      color: #7f1d1d;
+      box-shadow: 0 4px 10px rgba(252, 165, 165, 0.5);
+    }
+
+    .clear-btn:hover {
+      background: #ef4444;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .back-btn {
+      background: #bfdbfe;
+      color: #1e3a8a;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(191, 219, 254, 0.5);
+    }
+
+    .back-btn:hover {
+      background: #2563eb;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* Popup overlay */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .popup {
+      background: #fefefe;
+      padding: 25px 30px;
+      border-radius: 20px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      max-width: 300px;
+      animation: scaleIn 0.4s ease;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .popup h3 {
+      color: #1e3a8a;
+      margin-bottom: 15px;
+    }
+
+    .popup button {
+      margin: 5px;
+      padding: 8px 15px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .confirm { background: #60a5fa; color: white; }
+    .cancel { background: #e5e7eb; color: #374151; }
+    .confirm:hover { background: #2563eb; }
+    .cancel:hover { background: #d1d5db; }
+
+    #expenseChart {
+      margin: 20px auto;
+      max-width: 500px;
+    }
+
+    @media (max-width: 600px) {
+      .container { width: 90%; padding: 25px; }
+      table, th, td { font-size: 0.85rem; }
+      .summary div { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 View Records</h1>
+    <p id="welcomeUser"></p>
+
+    <div class="summary">
+      <div id="incomeBox">Income: ₹0</div>
+      <div id="expenseBox">Expense: ₹0</div>
+      <div id="balanceBox">Balance: ₹0</div>
+    </div>
+
+    <table id="recordsTable">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Amount (₹)</th>
+          <th>Type</th>
+          <th>Category</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <canvas id="expenseChart"></canvas>
+
+    <div class="buttons">
+      <a href="index.html" class="back-btn">← Back to Home</a>
+      <button class="clear-btn" id="clearAllBtn">🗑️ Clear All</button>
+    </div>
+  </div>
+
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup">
+      <h3>Clear all entries?</h3>
+      <p>This action cannot be undone.</p>
+      <button class="confirm" id="confirmClear">Yes, clear</button>
+      <button class="cancel" id="cancelClear">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // Welcome message
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (userInfo) {
+      document.getElementById("welcomeUser").textContent =
+        `Hello, ${userInfo.name || "User"} 👋 — here’s your record summary`;
+    }
+
+    const tableBody = document.querySelector("#recordsTable tbody");
+    let entries = JSON.parse(localStorage.getItem("financeEntries")) || [];
+
+    const incomeBox = document.getElementById("incomeBox");
+    const expenseBox = document.getElementById("expenseBox");
+    const balanceBox = document.getElementById("balanceBox");
+
+    function renderEntries() {
+      tableBody.innerHTML = "";
+      let totalIncome = 0;
+      let totalExpense = 0;
+
+      entries.forEach((entry, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${entry.desc}</td>
+          <td>${entry.amount.toFixed(2)}</td>
+          <td style="color:${entry.type==='income'?'#16a34a':'#dc2626'}">
+            ${entry.type==='income'?'Income 💰':'Expense 💸'}
+          </td>
+          <td>${entry.category}</td>
+          <td>${entry.date}</td>
+          <td><button class="delete-btn" onclick="deleteEntry(${index})">Delete</button></td>
+        `;
+        tableBody.appendChild(row);
+
+        if(entry.type==='income') totalIncome += entry.amount;
+        else totalExpense += entry.amount;
+      });
+
+      const balance = totalIncome - totalExpense;
+      incomeBox.textContent = `Income: ₹${totalIncome.toFixed(2)}`;
+      expenseBox.textContent = `Expense: ₹${totalExpense.toFixed(2)}`;
+      balanceBox.textContent = `Balance: ₹${balance.toFixed(2)}`;
+
+      renderChart();
+    }
+
+    function deleteEntry(index){
+      if(confirm("Delete this entry?")){
+        entries.splice(index,1);
+        localStorage.setItem("financeEntries", JSON.stringify(entries));
+        renderEntries();
+      }
+    }
+
+    // Popup
+    const popupOverlay = document.getElementById("popupOverlay");
+    const clearAllBtn = document.getElementById("clearAllBtn");
+    const confirmClear = document.getElementById("confirmClear");
+    const cancelClear = document.getElementById("cancelClear");
+
+    clearAllBtn.onclick = () => popupOverlay.style.display = "flex";
+    cancelClear.onclick = () => popupOverlay.style.display = "none";
+    confirmClear.onclick = () => {
+      localStorage.removeItem("financeEntries");
+      entries = [];
+      renderEntries();
+      popupOverlay.style.display = "none";
+      alert("All entries cleared successfully!");
+    };
+
+    // Chart.js
+    let chartInstance = null;
+    function renderChart(){
+      const expenseEntries = entries.filter(e=>e.type==='expense');
+      const categoryTotals = {};
+      expenseEntries.forEach(e=>{
+        categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
+      });
+
+      const labels = Object.keys(categoryTotals);
+      const data = Object.values(categoryTotals);
+
+      const ctx = document.getElementById('expenseChart').getContext('2d');
+      if(chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(ctx,{
+        type:'pie',
+        data:{
+          labels: labels,
+          datasets:[{
+            data: data,
+            backgroundColor: ['#60a5fa','#34d399','#f472b6','#fbbf24','#a78bfa','#f97316']
+          }]
+        },
+        options:{
+          responsive:true,
+          plugins:{legend:{position:'bottom'}}
+        }
+      });
+    }
+
+    renderEntries();
+  </script>
+</body>
+</html>

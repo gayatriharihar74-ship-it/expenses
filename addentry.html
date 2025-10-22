@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Entry | Daily Finance Tracker</title>
+
+  <style>
+    /* 🌈 Soft minimal gradient background */
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #f8fbff, #dbeafe);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* 🪟 Main Card */
+    .container {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      padding: 40px 45px;
+      width: 370px;
+      animation: fadeIn 0.8s ease;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 1.9rem;
+      color: #1e3a8a;
+    }
+
+    p {
+      color: #475569;
+      font-size: 0.95rem;
+      margin-bottom: 25px;
+    }
+
+    /* ✍️ Input and Select */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input,
+    select {
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      color: #334155;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+      transform: scale(1.02);
+    }
+
+    /* 💾 Save Button */
+    button {
+      margin-top: 10px;
+      padding: 12px;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(37, 99, 235, 0.35);
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+    }
+
+    /* 🔙 Back Button */
+    .back-btn {
+      display: inline-block;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .back-btn:hover {
+      color: #1e40af;
+      text-decoration: underline;
+    }
+
+    /* ✅ Popup */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #f0f9ff;
+      border: 2px solid #bae6fd;
+      color: #1e3a8a;
+      padding: 25px 40px;
+      border-radius: 20px;
+      font-weight: 600;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      animation: popIn 0.3s ease;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    /* 🧠 Responsive */
+    @media (max-width: 450px) {
+      .container {
+        width: 90%;
+        padding: 30px;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>💰 Add Entry</h1>
+    <p>Track your income or expense below</p>
+
+    <form id="entryForm">
+      <input type="text" id="desc" placeholder="Description (e.g., Salary, Grocery)" required />
+      <input type="number" id="amount" placeholder="Amount (₹)" required />
+      <select id="type" required>
+        <option value="">Select Type</option>
+        <option value="income">Income 💸</option>
+        <option value="expense">Expense 🧾</option>
+      </select>
+      <button type="submit">Save Entry</button>
+    </form>
+
+    <a href="index.html" class="back-btn">← Back to Home</a>
+  </div>
+
+  <!-- ✅ Popup -->
+  <div class="popup" id="popup">✅ Entry Saved Successfully!</div>
+
+  <script>
+    // Handle form submit
+    document.getElementById("entryForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const desc = document.getElementById("desc").value.trim();
+      const amount = parseFloat(document.getElementById("amount").value);
+      const type = document.getElementById("type").value;
+
+      if (!desc || !amount || !type) return;
+
+      const entry = {
+        desc,
+        amount,
+        type,
+        date: new Date().toLocaleString(),
+      };
+
+      // Save in localStorage
+      const entries = JSON.parse(localStorage.getItem("financeEntries")) || [];
+      entries.push(entry);
+      localStorage.setItem("financeEntries", JSON.stringify(entries));
+
+      // Show popup
+      const popup = document.getElementById("popup");
+      popup.style.display = "block";
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 1800);
+
+      // Reset form
+      this.reset();
+    });
+  </script>
+  
+</body>
+</html>
+

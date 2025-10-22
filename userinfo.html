@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Info | Daily Finance Tracker</title>
+
+  <style>
+    :root {
+      --bg: #f6fbff;
+      --card: #ffffff;
+      --accent: #4c8bf5;
+      --muted: #666;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, var(--bg), #e8f0fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    h2 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.6rem 0;
+      border: 1px solid #ddd;
+      border-radius: 0.8rem;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.9rem 1.2rem;
+      width: 100%;
+      font-size: 1rem;
+      border-radius: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    button:hover {
+      background: #3a72d8;
+      transform: scale(1.03);
+    }
+
+    .popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4c8bf5;
+      color: white;
+      padding: 0.8rem 1.2rem;
+      border-radius: 0.8rem;
+      display: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      animation: fadein 0.5s ease;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>👋 Let's Get to Know You</h2>
+
+    <input type="text" id="name" placeholder="Your Name" required />
+    <input type="text" id="profession" placeholder="Your Profession" />
+    <select id="earningSource">
+      <option value="">Select Earning Source</option>
+      <option>Salary</option>
+      <option>Business</option>
+      <option>Freelancing</option>
+      <option>Student Allowance</option>
+      <option>Other</option>
+    </select>
+
+    <button onclick="saveUserInfo()">Save Info</button>
+  </div>
+
+  <div id="popup" class="popup">✅ Info Saved Successfully!</div>
+
+  <script>
+    function saveUserInfo() {
+      const name = document.getElementById("name").value.trim();
+      const profession = document.getElementById("profession").value.trim();
+      const earningSource = document.getElementById("earningSource").value;
+
+      if (!name) {
+        alert("Please enter your name.");
+        return;
+      }
+
+      const userInfo = { name, profession, earningSource };
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+
+      // Popup animation
+      const popup = document.getElementById("popup");
+      popup.style.display = "block";
+      setTimeout(() => {
+        popup.style.display = "none";
+        window.location.href = "index.html"; // Redirect to main dashboard
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
